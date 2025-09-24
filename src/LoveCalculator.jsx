@@ -46,12 +46,16 @@ export default function LoveCalculator() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-tr from-pink-400 via-fuchsia-400 to-purple-500 p-6 relative overflow-hidden">
+    <div className="flex items-center justify-center min-h-screen p-6 relative overflow-hidden bg-smoke">
+      {/* soft gradient blobs background in palette */}
+      <div className="absolute -top-32 -left-32 h-80 w-80 rounded-full bg-sage/25 blur-3xl" />
+      <div className="absolute -bottom-40 -right-20 h-96 w-96 rounded-full bg-beige/40 blur-3xl" />
+      <div className="absolute top-1/3 -right-24 h-72 w-72 rounded-full bg-terra/20 blur-3xl" />
       {showConfetti && <Confetti recycle={false} numberOfPieces={300} />}
 
       {/* Floating emojis for fun */}
       <motion.div
-        className="absolute text-pink-500 text-4xl"
+        className="absolute text-sage text-4xl"
         animate={{ y: [0, -600], opacity: [1, 0] }}
         transition={{ duration: 6, repeat: Infinity, repeatType: "loop" }}
         style={{ left: "10%", top: "85%" }}
@@ -59,7 +63,7 @@ export default function LoveCalculator() {
         💕
       </motion.div>
       <motion.div
-        className="absolute text-red-400 text-5xl"
+        className="absolute text-terra text-5xl"
         animate={{ y: [0, -700], opacity: [1, 0] }}
         transition={{ duration: 7, repeat: Infinity, repeatType: "loop", delay: 1 }}
         style={{ left: "75%", top: "90%" }}
@@ -67,7 +71,7 @@ export default function LoveCalculator() {
         ❤️
       </motion.div>
       <motion.div
-        className="absolute text-purple-400 text-3xl"
+        className="absolute text-sage/70 text-3xl"
         animate={{ y: [0, -500], opacity: [1, 0] }}
         transition={{ duration: 5, repeat: Infinity, repeatType: "loop", delay: 2 }}
         style={{ left: "50%", top: "95%" }}
@@ -75,17 +79,17 @@ export default function LoveCalculator() {
         ✨
       </motion.div>
 
-      <Card className="w-full max-w-lg shadow-2xl rounded-3xl bg-white/90 backdrop-blur border border-pink-200">
+      <Card className="w-full max-w-lg shadow-2xl rounded-3xl">
         <CardContent className="p-8 text-center space-y-6">
           <motion.h1
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1 }}
-            className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-red-500 drop-shadow"
+            className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-sage to-terra drop-shadow"
           >
             💞 Love Calculator 💞
           </motion.h1>
-          <p className="text-gray-700 italic text-md">
+          <p className="text-charcoal/70 italic text-md">
             ✏️ Back to School Days – Relive those secret classroom crush vibes!
           </p>
 
@@ -94,26 +98,26 @@ export default function LoveCalculator() {
               placeholder="Your Name"
               value={name1}
               onChange={(e) => setName1(e.target.value)}
-              className="rounded-xl border-pink-400 focus:ring-pink-500"
+              className="rounded-2xl"
             />
             <Input
               placeholder="Crush's Name"
               value={name2}
               onChange={(e) => setName2(e.target.value)}
-              className="rounded-xl border-pink-400 focus:ring-pink-500"
+              className="rounded-2xl"
             />
           </div>
 
           <Button
             onClick={calculateLove}
-            className="w-full bg-gradient-to-r from-fuchsia-500 via-pink-500 to-red-500 hover:from-fuchsia-600 hover:to-red-600 text-white text-xl rounded-2xl py-6 shadow-lg"
+            className="w-full text-xl py-5 bg-gradient-to-r from-sage via-beige to-terra text-charcoal hover:opacity-95"
           >
             Calculate ❤️
           </Button>
 
           {loading && (
             <motion.div
-              className="text-2xl text-pink-600 mt-4"
+              className="text-2xl text-sage mt-4 drop-shadow"
               animate={{ scale: [1, 1.3, 1] }}
               transition={{ repeat: Infinity, duration: 0.8 }}
             >
@@ -128,10 +132,10 @@ export default function LoveCalculator() {
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.6 }}
             >
-              <h2 className="text-6xl font-extrabold text-pink-600 drop-shadow-md">
+              <h2 className="text-6xl font-extrabold text-sage drop-shadow-md">
                 {result}%
               </h2>
-              <p className="text-lg mt-3 text-gray-700 font-semibold">
+              <p className="text-lg mt-3 text-charcoal/80 font-semibold">
                 {getMessage(result)}
               </p>
             </motion.div>

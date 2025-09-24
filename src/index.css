@@ -4,4 +4,14 @@
 
 body {
   font-family: "Inter", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: radial-gradient(1200px 600px at 10% -10%, rgba(163,177,138,.12), transparent),
+              radial-gradient(900px 600px at 110% 110%, rgba(242,232,207,.18), transparent),
+              #FAFAFA;
+  color: #2F3E46;
+}
+
+::selection {
+  background: rgba(244, 114, 182, 0.35);
 }
