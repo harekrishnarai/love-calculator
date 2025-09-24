@@ -7,6 +7,19 @@ import { Input } from "./components/ui/input";
 import Confetti from "react-confetti";
 import * as htmlToImage from "html-to-image";
 
+function Toast({ message, show }) {
+  return (
+    <div
+      className={`fixed left-1/2 bottom-6 z-50 px-4 py-2 rounded-xl bg-black/80 text-white text-sm font-medium shadow-lg transition-all duration-500 pointer-events-none
+        ${show ? "opacity-100 translate-x-[-50%]" : "opacity-0 translate-y-4 translate-x-[-50%]"}`}
+      style={{ minWidth: 180, maxWidth: 320 }}
+      aria-live="polite"
+    >
+      {message}
+    </div>
+  );
+}
+
 export default function LoveCalculator() {
   const [name1, setName1] = useState("");
   const [name2, setName2] = useState("");
@@ -14,6 +27,8 @@ export default function LoveCalculator() {
   const [loading, setLoading] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
   const cardRef = useRef(null);
+  const [toast, setToast] = useState("");
+  const [showToast, setShowToast] = useState(false);
   const [viewport, setViewport] = useState({ w: typeof window !== 'undefined' ? window.innerWidth : 0, h: typeof window !== 'undefined' ? window.innerHeight : 0 });
 
   useEffect(() => {
@@ -88,6 +103,13 @@ export default function LoveCalculator() {
     return url.toString();
   }, [name1, name2]);
 
+  // Show toast for 2.5s
+  const showToastMsg = (msg) => {
+    setToast(msg);
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 2500);
+  };
+
   const shareImageAndLink = async () => {
     if (!cardRef.current) return;
     const title = "Our Love Result";
@@ -124,37 +146,51 @@ export default function LoveCalculator() {
             await navigator.share({ title, text, files: [file], url: shareUrl });
             return;
           } catch (_) {
-            // user canceled or not allowed, try URL-only next
+            // user canceled or not allowed, fallback to toast only
+            showToastMsg("Couldn't share automatically. Share this link: " + shareUrl);
+            return;
+          }
+        } else if (navigator.share) {
+          // If file sharing not supported, try URL-only share
+          try {
+            await navigator.share({ title, text, url: shareUrl });
+            return;
+          } catch (_) {
+            showToastMsg("Couldn't share automatically. Share this link: " + shareUrl);
+            return;
           }
         }
-        // If file sharing not supported, try URL-only share
-        if (await tryUrlShare()) return;
-
         // Fallback: copy link to clipboard (no download)
         try {
           await navigator.clipboard?.writeText?.(shareUrl);
-          alert("Link copied to clipboard! Share it anywhere ✨");
+          showToastMsg("Link copied to clipboard! Share it anywhere ✨");
         } catch {
-          alert("Share this link: " + shareUrl);
+          showToastMsg("Share this link: " + shareUrl);
         }
         return;
       }
 
       // If blob creation failed, try URL-only share
-      if (await tryUrlShare()) return;
+      if (navigator.share) {
+        try {
+          await navigator.share({ title, text, url: shareUrl });
+          return;
+        } catch (_) {
+          showToastMsg("Couldn't share automatically. Share this link: " + shareUrl);
+          return;
+        }
+      }
 
-      alert("Couldn't prepare image to share. Copy this link: " + shareUrl);
+      showToastMsg("Couldn't prepare image. Copy this link: " + shareUrl);
     } catch (e) {
       console.error("Share failed", e);
-      // As a last attempt, try to share URL only
-      if (!(await tryUrlShare())) {
-        alert("Couldn't share automatically. Share this link: " + shareUrl);
-      }
+      showToastMsg("Couldn't share automatically. Share this link: " + shareUrl);
     }
   };
 
   return (
-  <div className="flex items-center justify-center min-h-[100svh] px-4 py-6 sm:px-6 lg:px-8 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] relative overflow-hidden bg-smoke dark:bg-[#0a0a0b]">
+  <>
+    <div className="flex items-center justify-center min-h-[100svh] px-4 py-6 sm:px-6 lg:px-8 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] relative overflow-hidden bg-smoke dark:bg-[#0a0a0b]">
       {/* soft gradient blobs background in palette */}
   <div className="hidden sm:block absolute -top-32 -left-32 h-64 sm:h-80 w-64 sm:w-80 rounded-full bg-sage/25 dark:bg-pink-500/25 blur-3xl" />
   <div className="hidden md:block absolute -bottom-40 -right-20 h-72 md:h-96 w-72 md:w-96 rounded-full bg-beige/40 dark:bg-rose-500/20 blur-3xl" />
@@ -267,5 +303,7 @@ export default function LoveCalculator() {
         </CardContent>
       </Card>
     </div>
+    <Toast message={toast} show={showToast} />
+  </>
   );
 }
