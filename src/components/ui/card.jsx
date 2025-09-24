@@ -1,10 +1,12 @@
 import React from "react";
 
-export function Card({ className = "", children }) {
+export const Card = React.forwardRef(function Card({ className = "", children, ...props }, ref) {
   return (
     <div
+      ref={ref}
       className={`relative rounded-3xl bg-white/70 dark:bg-white/5 backdrop-blur-xl
       border border-beige/60 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.08)] overflow-hidden ${className}`}
+      {...props}
     >
       {/* gradient border glow */}
       <div
@@ -21,8 +23,12 @@ export function Card({ className = "", children }) {
       {children}
     </div>
   );
-}
+});
 
-export function CardContent({ className = "", children }) {
-  return <div className={`p-8 text-charcoal dark:text-white ${className}`}>{children}</div>;
-}
+export const CardContent = React.forwardRef(function CardContent({ className = "", children, ...props }, ref) {
+  return (
+    <div ref={ref} className={`p-8 text-charcoal dark:text-white ${className}`} {...props}>
+      {children}
+    </div>
+  );
+});
