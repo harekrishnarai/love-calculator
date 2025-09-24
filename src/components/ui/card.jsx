@@ -3,8 +3,8 @@ import React from "react";
 export function Card({ className = "", children }) {
   return (
     <div
-      className={`relative rounded-3xl bg-white/70 backdrop-blur-xl
-      border border-beige/60 shadow-[0_8px_30px_rgba(0,0,0,0.08)] overflow-hidden ${className}`}
+      className={`relative rounded-3xl bg-white/70 dark:bg-white/5 backdrop-blur-xl
+      border border-beige/60 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.08)] overflow-hidden ${className}`}
     >
       {/* gradient border glow */}
       <div
@@ -24,5 +24,5 @@ export function Card({ className = "", children }) {
 }
 
 export function CardContent({ className = "", children }) {
-  return <div className={`p-8 text-charcoal ${className}`}>{children}</div>;
+  return <div className={`p-8 text-charcoal dark:text-white ${className}`}>{children}</div>;
 }

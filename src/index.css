@@ -12,6 +12,15 @@ body {
   color: #2F3E46;
 }
 
+@media (prefers-color-scheme: dark) {
+  body {
+    background: radial-gradient(1200px 600px at 10% -10%, rgba(236,72,153,.12), transparent),
+                radial-gradient(900px 600px at 110% 110%, rgba(244,63,94,.10), transparent),
+                #0a0a0b;
+    color: #f5f5f6;
+  }
+}
+
 ::selection {
   background: rgba(244, 114, 182, 0.35);
 }
