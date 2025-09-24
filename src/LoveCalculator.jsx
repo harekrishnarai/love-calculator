@@ -88,61 +88,63 @@ export default function LoveCalculator() {
     const prefersDark = window.matchMedia?.("(prefers-color-scheme: dark)")?.matches;
     const bg = prefersDark ? "#0a0a0b" : "#ffffff";
 
-    // Helper: try native share without files first (widest support)
+    // Helper: share URL only (opens share sheet on many platforms)
     const tryUrlShare = async () => {
-      if (navigator.share) {
-        try {
-          await navigator.share({ title, text, url: shareUrl });
-          return true;
-        } catch (err) {
-          // user cancel or unsupported payload
-          return false;
-        }
+      if (!navigator.share) return false;
+      try {
+        await navigator.share({ title, text, url: shareUrl });
+        return true;
+      } catch (err) {
+        return false;
       }
-      return false;
     };
 
-    // Try URL share first to open apps immediately where possible
-    const urlShared = await tryUrlShare();
-    if (urlShared) return;
-
     try {
-      // Create a clean snapshot of the card area
-      const dataUrl = await htmlToImage.toPng(cardRef.current, {
+      // Create a clean snapshot of the card area (directly as Blob)
+      const blob = await htmlToImage.toBlob(cardRef.current, {
         cacheBust: true,
-        quality: 1,
         pixelRatio: 2,
         backgroundColor: bg,
       });
 
       const fileName = `love-${(name1 || "you").replace(/\s+/g, "_")}-${(name2 || "crush").replace(/\s+/g, "_")}.png`;
 
-      // Share with file if supported
-      if (navigator.canShare && navigator.canShare({ files: [new File([new Blob()], "x.png", { type: "image/png" })] })) {
-        const res = await fetch(dataUrl);
-        const blob = await res.blob();
+      if (blob) {
         const file = new File([blob], fileName, { type: "image/png" });
-        try {
-          await navigator.share({ title, text, url: shareUrl, files: [file] });
-          return;
-        } catch (_) {
-          // fall through to download/clipboard
+        // Try sharing with the actual file first
+        if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+          try {
+            await navigator.share({ title, text, files: [file], url: shareUrl });
+            return;
+          } catch (_) {
+            // user canceled or not allowed, try URL-only next
+          }
         }
+        // If file sharing not supported, try URL-only share
+        if (await tryUrlShare()) return;
+
+        // Fallback: download blob and copy link
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+        try {
+          await navigator.clipboard?.writeText?.(shareUrl);
+          alert("Image downloaded. Link copied to clipboard! ✨");
+        } catch {
+          alert("Image downloaded. Copy this link to share: " + shareUrl);
+        }
+        return;
       }
 
-      // Fallback: download image + copy link
-      const a = document.createElement("a");
-      a.href = dataUrl;
-      a.download = fileName;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      try {
-        await navigator.clipboard?.writeText?.(shareUrl);
-        alert("Image downloaded. Link copied to clipboard! ✨");
-      } catch {
-        alert("Image downloaded. Copy this link to share: " + shareUrl);
-      }
+      // If blob creation failed, try URL-only share
+      if (await tryUrlShare()) return;
+
+      alert("Couldn't prepare image to share. Copy this link: " + shareUrl);
     } catch (e) {
       console.error("Share failed", e);
       // As a last attempt, try to share URL only
@@ -233,7 +235,7 @@ export default function LoveCalculator() {
                 className="w-full text-base py-3 mt-2 bg-gradient-to-r from-emerald-400 via-sage to-terra text-charcoal hover:opacity-95 dark:from-pink-600 dark:via-fuchsia-600 dark:to-rose-600 dark:text-white"
                 aria-label="Share result"
               >
-                ✨ Share this moment (image + link)
+                ✨ Share this moment with your partner ✨
               </Button>
             </div>
           )}
